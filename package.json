@@ -2,10 +2,15 @@
   "name": "home.three",
   "version": "1.0.0",
   "description": "My Home in Three.js perspective",
-  "main": "index.js",
+  "main": "src/index.html",
   "scripts": {
-    "test": "test"
+    "test": "mocha --reporter list",
+    "compile": "tsc",
+    "clean": "rm -rf dist",
+    "setup": "npm install --save three && npm install yarn --save-dev",
+    "dist": "npm publish dist"
   },
+  "output": "./dist",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/PouyaPanahy/Home.three.git"
@@ -15,8 +20,19 @@
   ],
   "author": "Pouya Panahy",
   "license": "ISC",
+  "files": [
+    "src"
+  ],
   "bugs": {
     "url": "https://github.com/PouyaPanahy/Home.three/issues"
   },
-  "homepage": "https://github.com/PouyaPanahy/Home.three#readme"
+  "homepage": "https://github.com/PouyaPanahy/Home.three#readme",
+  "dependencies": {
+    "three": "^0.138.3"
+  },
+  "devDependencies": {
+    "mocha": "^9.2.1",
+    "webpack-cli": "^4.9.2",
+    "yarn": "^1.22.17"
+  }
 }
