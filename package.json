@@ -1,0 +1,22 @@
+{
+  "name": "home.three",
+  "version": "1.0.0",
+  "description": "My Home in Three.js perspective",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PouyaPanahy/Home.three.git"
+  },
+  "keywords": [
+    "Three.js"
+  ],
+  "author": "Pouya Panahy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PouyaPanahy/Home.three/issues"
+  },
+  "homepage": "https://github.com/PouyaPanahy/Home.three#readme"
+}
