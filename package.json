@@ -7,7 +7,7 @@
     "test": "mocha --reporter list",
     "compile": "tsc",
     "clean": "rm -rf dist",
-    "setup": "npm install --save three && npm install yarn --save-dev",
+    "setup": "npm install --save three ",
     "dist": "npm publish dist"
   },
   "output": "./dist",

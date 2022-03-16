@@ -63,25 +63,71 @@
 
 		const SCREEN_WIDTH = window.innerWidth;
 		const SCREEN_HEIGHT = window.innerHeight;
+		const WALL_INNER_HEIGHT = 242; // cm
+		const COLOR_white = 0xffffff;
+		const COLOR_khaki = 0xF0E68C;
 
 		let container, stats, light;
 		let camera, scene, renderer;
 		
-		init();        
+		init();     
         animate();
 
 		function addCamera() {
 			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
-        	camera.position.set( 310, 50, 300 );
+        	camera.position.set( 510, 150, 300 );
 			
 			// const helper = new THREE.CameraHelper( camera );
 			// scene.add( helper );
 		}
 		function addLight(){
-			// LIGHTS
-			light = new THREE.DirectionalLight( 0xaabbff, 0.3 );
-			light.position.set( 10, 10, 1 );
+			// LIGHTS: DirectionalLight( color : Integer, intensity : Float )
+
+			// light = new THREE.DirectionalLight( );
+			//light = new THREE.AmbientLightProbe( 0x404040, 100 );
+			//light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+			light = new THREE.SpotLight( 0xffffff );
+			// light = new THREE.PointLight( 0xffe673, 5,60 );
+
+			light.castShadow = true; // default false
+			//light.position.set( 10, 10, 1 );
+			light.position.set( 400, WALL_INNER_HEIGHT-50, 200 );
+
+			light.shadowDarkness = 0.5
+
+			light.shadow.mapSize.width = 1024;
+			light.shadow.mapSize.height = 1024;
+
+			light.shadow.radius = 2000;
+			light.shadow.bias = 0.0039;
+
+			light.shadow.camera.near = 0.1;
+			light.shadow.camera.far = 400;
+			light.shadow.camera.fov = 300;
+
+			// light.shadow.camera.left = -100;
+			// light.shadow.camera.right = 100;
+			// light.shadow.camera.top = 100;
+			// light.shadow.camera.bottom = -100;
+
 			scene.add( light );
+
+			//Set up shadow properties for the light
+			// light.shadow.mapSize.width = 512; // default
+			// light.shadow.mapSize.height = 512; // default
+			// light.shadow.camera.near = 0.5; // default
+			// light.shadow.camera.far = 500; // default
+
+			//Create a helper for the shadow camera (optional)
+			var helper = new THREE.CameraHelper( light.shadow.camera );
+			scene.add( helper );
+
+			// helper = new THREE.DirectionalLightHelper( light, 5 , COLOR_white);
+			// scene.add( helper );
+
+			scene.add(new THREE.AmbientLight(0x212223, 0.1));
+
+
 		}
 		function addSky() {
 			const vertexShader = document.getElementById( 'vertexShader' ).textContent;
@@ -108,6 +154,9 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			//renderer.setAnimationLoop( animation );
+			renderer.shadowMap.enabled = true;
+			renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+
 			container.appendChild( renderer.domElement );
 		}
 		function addControls() {			
@@ -115,20 +164,70 @@
 			controls.maxPolarAngle = 0.9 * Math.PI / 2;
 			controls.enableZoom = true;
 		}
-		function addMesh() {
+		
+		function add_Walls() {
 			// BoxGeometry(width : Float, height : Float, depth : Float, widthSegments : Integer, heightSegments : Integer, depthSegments : Integer)
-			var material = new THREE.MeshNormalMaterial();
-			material = new THREE.MeshBasicMaterial( { color: 0xaaff00 } );
-			
-			var geometry = new THREE.BoxGeometry( 226, 242, 0 );
-			const back_box = new THREE.Mesh( geometry, material );			
-			back_box.position.set(0, 0, 0);
-			scene.add( back_box );
+			// var material = new THREE.MeshNormalMaterial();
+			var material = new THREE.MeshStandardMaterial( { color: COLOR_white, map: new THREE.TextureLoader().load( 'textures/white-wall.jpg' ) } );
+			// var material = new THREE.MeshBasicMaterial( {color: COLOR_white,  map: new THREE.TextureLoader().load( 'textures/white-wall.jpg' ) } );
 
-			// geometry = new THREE.BoxGeometry( 226, 30, 53 );
-			// var cube = new THREE.Mesh( geometry, material );
-			// cube.position.set(0, 0, 0);
-			// scene.add( cube );
+			const receiveShadow = true;
+			const castShadow = true;
+			var geometry = new THREE.BoxGeometry( 246, WALL_INNER_HEIGHT, 1 );
+			var wall = new THREE.Mesh( geometry, material );			
+			wall.position.set(246/2, WALL_INNER_HEIGHT/2, 0);
+			wall.receiveShadow = receiveShadow; //default is false
+			wall.castShadow = castShadow; //default is false
+			scene.add( wall );
+
+			geometry = new THREE.BoxGeometry( 0, WALL_INNER_HEIGHT, 64 );
+			wall = new THREE.Mesh( geometry, material );			
+			wall.position.set(246, WALL_INNER_HEIGHT/2, 64/2);
+			wall.receiveShadow = receiveShadow; //default is false
+			wall.castShadow = castShadow; //default is false
+			scene.add( wall );
+			
+			geometry = new THREE.BoxGeometry( 201, WALL_INNER_HEIGHT, 1 );
+			wall = new THREE.Mesh( geometry, material );			
+			wall.position.set(226+201/2, WALL_INNER_HEIGHT/2, 64);
+			wall.receiveShadow = receiveShadow; //default is false
+			wall.castShadow = castShadow; //default is false
+			scene.add( wall );
+
+			geometry = new THREE.BoxGeometry( 1, WALL_INNER_HEIGHT, 64 );
+			wall = new THREE.Mesh( geometry, material );			
+			wall.position.set(226+201-20, WALL_INNER_HEIGHT/2, 64/2);
+			wall.receiveShadow = receiveShadow; //default is false
+			wall.castShadow = castShadow; //default is false
+			scene.add( wall );
+
+			// side wall with window
+			geometry = new THREE.BoxGeometry( 1, WALL_INNER_HEIGHT, 100 );
+			wall = new THREE.Mesh( geometry, material );			
+			wall.position.set(0, WALL_INNER_HEIGHT/2, 100/2);
+			wall.receiveShadow = receiveShadow; //default is false
+			wall.castShadow = castShadow; //default is false
+			scene.add( wall );
+		}
+		function add_ceiling(){
+			var whiteMaterial = new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader().load( 'textures/white-wall.jpg' ) } );
+			
+			var geometry = new THREE.BoxGeometry( 791, 0, 458 );
+			var ceiling = new THREE.Mesh( geometry,  whiteMaterial );
+			ceiling.position.set(791/2, WALL_INNER_HEIGHT, 458/2);
+			scene.add( ceiling );
+		}
+		function add_floor(){
+			var darkMaterial = new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader().load( 'textures/dark-gray.jpg' ) } );
+
+			var geometry = new THREE.BoxGeometry( 791, 0, 458 );
+			var floor = new THREE.Mesh( geometry,  darkMaterial );
+			floor.position.set(791/2, 0, 458/2);
+			floor.receiveShadow = true; //default is false
+			scene.add( floor );
+		}
+		function add_Closit() {
+
 		}
 		function init() {
 			container = document.createElement( 'div' );
@@ -137,20 +236,23 @@
 
         	scene = new THREE.Scene();
 			addCamera();
-			addLight();
-			addSky();
+			//addSky();
 			addRenderer();
-			addControls();
+			addLight();
 			
+			add_Walls();
+			//add_ceiling();
+			add_floor();
+			add_Closit();
+			
+			addControls();
 			const axesHelper = new THREE.AxesHelper( 50 );
 			scene.add( axesHelper );
 
-			showGrid(300, 10);
+			showGrid(600, 10);
 			// STATS
-			// stats = new Stats();
-			// container.appendChild( stats.dom );
-
-			addMesh();
+			stats = new Stats();
+			container.appendChild( stats.dom );
 		}
 		
 		function showGrid(size, divisions) {
@@ -162,7 +264,7 @@
             requestAnimationFrame( animate );
 
             renderer.render( scene, camera );
-            // stats.update();
+            stats.update();
 
         }
         function animation2( time ) {
